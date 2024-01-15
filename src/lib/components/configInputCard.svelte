@@ -11,7 +11,7 @@
 	import { config } from '$lib/stores';
 	import { superForm, superValidateSync } from 'sveltekit-superforms/client';
 	import { z } from 'zod';
-    	import { goto } from '$app/navigation';
+	import { goto } from '$app/navigation';
 
 	import { toast } from 'svelte-sonner';
 
@@ -25,7 +25,7 @@
 		endpoint: z.string()
 	});
 
-	const { form, errors, enhance, constraints, delayed, allErrors } = superForm(
+	const { form, errors, enhance, constraints, delayed } = superForm(
 		superValidateSync(schema),
 		{
 			SPA: true,
@@ -37,15 +37,14 @@
 					await toast.promise(fetchConfig(form.data.apiKey, form.data.endpoint), {
 						loading: 'Retrieving config...',
 						success: (response: any) => {
-                            window.sessionStorage.setItem('vyos-apikey', form.data.apiKey)
-                            window.localStorage.setItem('vyos-endpoint-url', form.data.endpoint)
+							window.sessionStorage.setItem('vyos-apikey', form.data.apiKey);
+							window.localStorage.setItem('vyos-endpoint-url', form.data.endpoint);
 							config.set(response);
-                            goto("/config")
+							goto('/config');
 							return 'Config loaded successfully';
 						},
-                        error: 'Something went wrong! Check if the entered values are correct.'
+						error: 'Something went wrong! Check if the entered values are correct.'
 					});
-					
 				}
 			}
 		}
@@ -114,7 +113,7 @@
 					{...$constraints.endpoint}
 				/>
 				<Label for="apiKey">VyOS API Key</Label>
-				<div class="flex w-full items-center space-x-2">
+				<div class="flex items-center w-full space-x-2">
 					<Input
 						id="apiKey"
 						type="text"
@@ -141,7 +140,7 @@
 				</Button>
 			{:else}
 				<Button disabled class="w-full">
-					<Loader2 class="mr-2 h-4 w-4 animate-spin" />
+					<Loader2 class="w-4 h-4 mr-2 animate-spin" />
 				</Button>
 			{/if}
 		</Card.Footer>
@@ -153,10 +152,11 @@
 		<Tooltip.Content side="right">Coming soon</Tooltip.Content>
 	</Tooltip.Root>
 	<Alert.Root>
-		<CloudOff class="h-4 w-4" />
+		<CloudOff class="w-4 h-4" />
 		<Alert.Title>Notice</Alert.Title>
 		<Alert.Description>
-			All processing occurs locally in your browser, ensuring data privacy with no transmission of sensitive information to external servers.
+			All processing occurs locally in your browser, ensuring data privacy with no transmission of
+			sensitive information to external servers.
 		</Alert.Description>
 	</Alert.Root>
 </div>

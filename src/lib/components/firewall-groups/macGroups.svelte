@@ -1,17 +1,24 @@
 <script lang="ts">
 	import * as Card from '$lib/components/ui/card';
-	import { Component, SquareStack } from 'lucide-svelte';
+	import { Component, SquareStack, Plus } from 'lucide-svelte';
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import * as Table from '$lib/components/ui/table';
 	import { Badge } from '$lib/components/ui/badge';
 	import { config } from '$lib/stores';
+	import { AddMacGroupDrawer } from '$lib/components/firewall-groups';
+
 </script>
 
 <Card.Root>
 	<Card.Header>
-		<Card.Title tag="h1" class="flex items-center gap-2 text-2xl">
-			<Component />
-			MAC Groups
+		<Card.Title tag="h1" class="flex items-center text-2xl">
+			<div class="flex items-center gap-2">
+				<Component />
+				MAC Groups
+			</div>
+			<div class="!ml-auto">
+				<AddMacGroupDrawer />
+			</div>
 		</Card.Title>
 		<Card.Description>A mac group represents a collection of mac addresses.</Card.Description>
 	</Card.Header>
