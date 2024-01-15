@@ -3,19 +3,22 @@
 	import { MacGroups, NetworkGroups } from '$lib/components/firewall-groups';
 	import ConfigInputCard from '$lib/components/configInputCard.svelte';
 	import LightSwitch from '$lib/components/lightSwitch.svelte';
-	import Menubar from '$lib/components/menubar.svelte';
 	import * as Tabs from '$lib/components/ui/tabs';
 	import { Button } from '$lib/components/ui/button';
 	import { Github } from 'lucide-svelte';
 </script>
 
-<ConfigInputCard />
-<div class="fixed bottom-4 right-4">
-	<Button
-		variant="outline"
-		on:click={() => window.open('https://github.com/LickABrick/VyZualise/', '_blank')}
-	>
-		<Github class="h-[1.2rem] w-[1.2rem]" />
-	</Button>
-	<LightSwitch />
-</div>
+
+<Tabs.Root value="mac" class="w-full">
+	<Tabs.List>
+		<Tabs.Trigger value="mac">MAC</Tabs.Trigger>
+		<Tabs.Trigger value="network">Network</Tabs.Trigger>
+	</Tabs.List>
+	<Tabs.Content value="mac">
+		<MacGroups />
+		
+	</Tabs.Content>
+	<Tabs.Content value="network">
+        <NetworkGroups />
+    </Tabs.Content>
+</Tabs.Root>
