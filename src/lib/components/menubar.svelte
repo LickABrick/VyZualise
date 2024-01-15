@@ -17,6 +17,7 @@
 		<Menubar.Trigger>Service</Menubar.Trigger>
 		<Menubar.Content>
 			<Menubar.Item on:click={() => goto('/config/service/dhcp')}>DHCP</Menubar.Item>
+			<Menubar.Item on:click={() => goto('/config/service/wireguard')}>Wireguard</Menubar.Item>
 		</Menubar.Content>
 	</Menubar.Menu>
 	<Menubar.Menu>

@@ -12,7 +12,7 @@
 
 <ModeWatcher />
 <Toaster />
-<div class="min-h-screen flex flex-col bg-background mx-48 gap-2 mt-4">
+<div class="flex flex-col min-h-screen gap-2 mx-48 mt-4 bg-background">
     <slot />
 </div>
 
