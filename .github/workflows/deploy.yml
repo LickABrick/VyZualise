@@ -28,7 +28,7 @@ jobs:
 
       - name: build
         env:
-          BASE_PATH: 'https://lickabrick.github.io/VyZualise'
+          BASE_PATH: '/https://lickabrick.github.io/VyZualise'
         run: |
           npm run build
 
