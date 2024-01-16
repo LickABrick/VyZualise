@@ -3,6 +3,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Github } from 'lucide-svelte';
 	import { goto } from '$app/navigation';
+	import LightSwitch from './lightSwitch.svelte';
 </script>
 
 <Menubar.Root>
@@ -20,16 +21,19 @@
 			<Menubar.Item on:click={() => goto('/config/service/wireguard')}>Wireguard</Menubar.Item>
 		</Menubar.Content>
 	</Menubar.Menu>
-	<Menubar.Menu>
-		<Menubar.Trigger class="!ml-auto">
-			<Github class="h-[1.2rem] w-[1.2rem]" />
-		</Menubar.Trigger>
-		<Menubar.Content>
-			<Menubar.Item
-				on:click={() => window.open('https://github.com/LickABrick/VyZualise/', '_blank')}
-			>
-				View on Github
-			</Menubar.Item>
-		</Menubar.Content>
-	</Menubar.Menu>
+	<div class="!ml-auto flex flex-row">
+		<LightSwitch variant="ghost" />
+		<Menubar.Menu>
+			<Menubar.Trigger>
+				<Github class="h-[1.2rem] w-[1.2rem]" />
+			</Menubar.Trigger>
+			<Menubar.Content>
+				<Menubar.Item
+					on:click={() => window.open('https://github.com/LickABrick/VyZualise/', '_blank')}
+				>
+					View on Github
+				</Menubar.Item>
+			</Menubar.Content>
+		</Menubar.Menu>
+	</div>
 </Menubar.Root>

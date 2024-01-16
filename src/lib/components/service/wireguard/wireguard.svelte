@@ -38,7 +38,6 @@
 						</Card.Title>
 						<Card.Description>{item.description}</Card.Description>
 					</Card.Header>
-
 					<Card.Content>
 						<div class="flex gap-2">
 							<Card.Root class="h-auto grow">
