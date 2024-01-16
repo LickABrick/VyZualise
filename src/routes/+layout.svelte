@@ -4,9 +4,10 @@
     import { Toaster } from "$lib/components/ui/sonner";
     import { config } from "$lib/stores"
 	import { goto } from '$app/navigation';
+	import { base } from '$app/paths';
 
     if($config) {
-        goto('/config');
+        goto(`${base}/config`);
     }
 </script>
 

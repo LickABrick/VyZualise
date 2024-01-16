@@ -4,6 +4,7 @@
 	import { Github } from 'lucide-svelte';
 	import { goto } from '$app/navigation';
 	import LightSwitch from './lightSwitch.svelte';
+	import { base } from "$app/paths";
 </script>
 
 <Menubar.Root>
@@ -11,14 +12,14 @@
 	<Menubar.Menu>
 		<Menubar.Trigger>Firewall</Menubar.Trigger>
 		<Menubar.Content>
-			<Menubar.Item on:click={() => goto('/config/firewall/groups')}>Groups</Menubar.Item>
+			<Menubar.Item on:click={() => goto(`${base}/config/firewall/groups`)}>Groups</Menubar.Item>
 		</Menubar.Content>
 	</Menubar.Menu>
 	<Menubar.Menu>
 		<Menubar.Trigger>Service</Menubar.Trigger>
 		<Menubar.Content>
-			<Menubar.Item on:click={() => goto('/config/service/dhcp')}>DHCP</Menubar.Item>
-			<Menubar.Item on:click={() => goto('/config/service/wireguard')}>Wireguard</Menubar.Item>
+			<Menubar.Item on:click={() => goto(`${base}/config/service/dhcp`)}>DHCP</Menubar.Item>
+			<Menubar.Item on:click={() => goto(`${base}/config/service/wireguard`)}>Wireguard</Menubar.Item>
 		</Menubar.Content>
 	</Menubar.Menu>
 	<div class="!ml-auto flex flex-row">

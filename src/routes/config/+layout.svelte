@@ -8,9 +8,10 @@
     import LightSwitch from '$lib/components/lightSwitch.svelte';
     import { Button } from '$lib/components/ui/button';
 	import { Github } from 'lucide-svelte';
+	import { base } from '$app/paths';
 
     if(!$config) {
-        goto("/")
+        goto(`${base}/`)
     }
 </script>
 

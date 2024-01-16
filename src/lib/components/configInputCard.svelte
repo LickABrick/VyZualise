@@ -14,6 +14,7 @@
 	import { goto } from '$app/navigation';
 
 	import { toast } from 'svelte-sonner';
+	import { base } from '$app/paths';
 
 	onMount(async () => {
 		$form.apiKey = window.sessionStorage.getItem('vyos-apikey') || '';
@@ -40,7 +41,7 @@
 							window.sessionStorage.setItem('vyos-apikey', form.data.apiKey);
 							window.localStorage.setItem('vyos-endpoint-url', form.data.endpoint);
 							config.set(response);
-							goto('/config');
+							goto(`${base}/config`);
 							return 'Config loaded successfully';
 						},
 						error: 'Something went wrong! Check if the entered values are correct.'
