@@ -1,6 +1,6 @@
 <script lang="ts">
 	import * as Alert from '$lib/components/ui/alert';
-	import { CloudOff, HelpCircle, Rocket, Loader2 } from 'lucide-svelte';
+	import { CloudOff, HelpCircle, Rocket, Loader2, AlertTriangle } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 	import { Label } from '$lib/components/ui/label';
 	import { Button } from '$lib/components/ui/button';
@@ -94,6 +94,13 @@
 </script>
 
 <div class="mx-auto my-[20vh] flex w-[32rem] flex-col gap-2">
+	<Alert.Root variant="destructive">
+		<AlertTriangle class="w-4 h-4" />
+		<Alert.Title>Beware</Alert.Title>
+		<Alert.Description>
+			VyZualise is still in early development. Do not user it for production environments!
+		</Alert.Description>
+	</Alert.Root>
 	<Card.Root>
 		<Card.Header>
 			<Card.Title>VyZualise</Card.Title>
@@ -154,7 +161,7 @@
 	</Tooltip.Root>
 	<Alert.Root>
 		<CloudOff class="w-4 h-4" />
-		<Alert.Title>Notice</Alert.Title>
+		<Alert.Title>Privacy Notice</Alert.Title>
 		<Alert.Description>
 			All processing occurs locally in your browser, ensuring data privacy with no transmission of
 			sensitive information to external servers.
