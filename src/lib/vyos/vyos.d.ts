@@ -3,16 +3,19 @@ declare class Client {
     apiKey: string;
 
     constructor(baseUrl: string, apiKey: string);
-
-    firewall: {
-        group: {
-            macGroup: (groupName: string) => {
-                set: (value: string) => Promise<void>;
+    set: {
+        firewall: {
+            group: {
+                macGroup: (groupName: string) => {
+                    address: (values: string[]) => Promise<void>;
+                    description: (description: string) => Promise<void>;
+                    include: (values: string[]) => Promise<void>;
+                };
             };
         };
     };
 
-    request(method: string, url: string, data?: any): Promise<any>;
+    request(method: string, url: string, data?: string): Promise<any>;
 }
 
 export { Client as default };

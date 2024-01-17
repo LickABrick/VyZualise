@@ -1,5 +1,3 @@
-import type { MacAddress } from "$lib/schemas";
-
 class Client {
 	baseUrl: string;
 	apiKey: string;
@@ -8,72 +6,69 @@ class Client {
 		this.baseUrl = baseUrl;
 		this.apiKey = apiKey;
 	}
-	// TODO: change so it will be Client.set.firewall.macGroup('name').address(['list', 'of', 'values'])
-	// TODO: create Client.set.firewall.macGroup('name').description('Description')
-	// TODO: create Client.set.firewall.macGroup('name').include('name of group to include')
-	firewall = {
-		group: {
-			macGroup: (groupName: string) => {
-				return {
-					set: async (value: string) => {
-						console.log("hoi")
-						const url = `${this.baseUrl}/configure`;
-						const data = `{"op": "set", "path": ["firewall", "group", "mac-group", "${groupName}", "mac-address", "${value}"]}`;
-						
-						try {
-							const result = await this.request('POST', url, data);
-							console.log('Operation successful:', result);
-						} catch (error) {
-							console.error('Error:', error.message);
-						}
-					},
-				};
+
+	set = {
+		firewall: {
+			group: {
+				macGroup: (groupName: string) => {
+					return {
+						address: async (values: string[]) => {
+							const operations = values.map(value => ({
+								op: 'set',
+								path: ['firewall', 'group', 'mac-group', groupName, 'mac-address', value],
+							}));
+							await this.performOperation(operations);
+						},
+						description: async (description: string) => {
+							await this.performOperation([
+								{ op: 'set', path: ['firewall', 'group', 'mac-group', groupName, 'description', description] },
+							]);
+						},
+						include: async (values: string[]) => {
+							const operations = values.map(value => ({
+								op: 'set',
+								path: ['firewall', 'group', 'mac-group', groupName, 'include', value],
+							}))
+							await this.performOperation(operations);
+						},
+					};
+				},
 			},
 		},
 	};
 
-	request(method: string, url: string, data?: any): Promise<any> {
-		return new Promise((resolve, reject) => {
-			try {
-				// const form = new FormData();
-				// form.append('data', data);
-				// form.append('key', this.apiKey);
-				const form = new FormData();
-				form.append(
-					'data',
-					data
-				);
+	private async performOperation(operations: { op: string; path: string[] }[]) {
+		try {
+			const url = `${this.baseUrl}/configure`;
+			const data = JSON.stringify(operations);
+
+			await this.request('POST', url, data);
+		} catch (error) {
+			console.error('Error:', error.message);
+			throw error; // Propagate the error
+		}
+	}
+
+	private async request(method: string, url: string, data?: string | Blob): Promise<any> {
+		try {
+			const form: FormData | undefined = data ? new FormData() : undefined;
+			if (form) {
+				form.append('data', data as string);
 				form.append('key', this.apiKey);
-
-				fetch(url, {
-					method,
-					body: form
-				})
-					.then((response) => {
-						// Check if the request was successful (status code 2xx)
-						if (!response.ok) {
-							throw new Error(`HTTP error! Status: ${response.status}`);
-						}
-						// Parse the response as JSON and resolve the promise
-
-						return response.json();
-					})
-					.then((configData) => {
-						resolve(configData);
-					})
-					.catch((error) => {
-						// Handle errors and reject the promise
-						console.error('Fetch error:', error);
-						reject(error);
-					});
-			} catch (error) {
-				// Handle other synchronous errors and reject the promise
-				console.error('Error:', error);
-				reject(error);
 			}
-		});
+
+			const response = await fetch(url, { method, body: form || undefined });
+
+			if (!response.ok) {
+				throw new Error(`HTTP error! Status: ${response.status}`);
+			}
+
+			return await response.json();
+		} catch (error) {
+			console.error('Fetch error:', error);
+			throw error; // Propagate the error
+		}
 	}
 }
-
 
 export { Client as default };
