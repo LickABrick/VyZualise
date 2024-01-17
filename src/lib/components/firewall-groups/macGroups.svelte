@@ -1,12 +1,15 @@
 <script lang="ts">
 	import * as Card from '$lib/components/ui/card';
-	import { Component, SquareStack, Plus } from 'lucide-svelte';
+	import { Component, SquareStack, Plus, Pen } from 'lucide-svelte';
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import * as Table from '$lib/components/ui/table';
 	import { Badge } from '$lib/components/ui/badge';
 	import { config } from '$lib/stores';
 	import { AddMacGroupDrawer } from '$lib/components/firewall-groups';
+	import { Button } from '../ui/button';
 
+	let groupToEdit: string | undefined;
+	let addGroupDrawerOpen: boolean = false;
 </script>
 
 <Card.Root>
@@ -18,7 +21,11 @@
 			</div>
 			<div class="!ml-auto">
 				<!-- TODO: On open of drawer pass the groupName to the drawer so it will show the corresponding values in the drawer -->
-				<AddMacGroupDrawer groupName="TEST-GROUP" />
+				<Button
+					variant="secondary"
+					class="!ml-auto font-semibold"
+					on:click={() => {addGroupDrawerOpen = true; groupToEdit = undefined}}>Create Group</Button
+				>
 			</div>
 		</Card.Title>
 		<Card.Description>A mac group represents a collection of mac addresses.</Card.Description>
@@ -31,6 +38,7 @@
 					<Table.Head>Name</Table.Head>
 					<Table.Head>Description</Table.Head>
 					<Table.Head class="text-right">MAC</Table.Head>
+					<Table.Head></Table.Head>
 				</Table.Row>
 			</Table.Header>
 			<Table.Body>
@@ -71,6 +79,16 @@
 								{/each}
 							{/if}
 						</Table.Cell>
+						<Table.Cell class="w-[2rem]">
+							<Button
+								variant="outline"
+								size="icon"
+								on:click={() => {
+									groupToEdit = name;
+									addGroupDrawerOpen = true;
+								}}><Pen class="size-[1.2rem]" /></Button
+							>
+						</Table.Cell>
 					</Table.Row>
 				{/each}
 			</Table.Body>
@@ -80,3 +98,4 @@
 		<p>Card Footer</p>
 	</Card.Footer>
 </Card.Root>
+<AddMacGroupDrawer bind:open={addGroupDrawerOpen} bind:groupName={groupToEdit} />

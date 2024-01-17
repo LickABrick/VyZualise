@@ -11,10 +11,37 @@
 	import SuperDebug from 'sveltekit-superforms/client/SuperDebug.svelte';
 	import TagsInput from '../tags-input/tags-input.svelte';
 	import { writable, type Writable } from 'svelte/store';
-	
-	export let groupName: any
-	let tags: Writable<string[]> = writable($config.data.firewall.group['mac-group'][`${groupName}`]['mac-address'].map((value: MacAddress) => ({ id: value, value: value})))
-	let open: boolean = false;
+	import { Value } from '../ui/select';
+
+	export let groupName: any;
+	let data;
+	let tags: Writable<string[]> = writable([]);
+
+	$: console.log(typeof tags)
+	// $: tags = writable(groupName ? $config.data.firewall.group['mac-group'][`${groupName}`]['mac-address'].map((value: MacAddress) => ({ id: value, value: value})) : [])
+	// BUG: mac not added to tags due to this function running everytime a mac is added and the tags is set to its initial value again.
+	$: if (groupName) {
+		console.log(groupName)
+		data = $config.data.firewall.group['mac-group'][`${groupName}`]['mac-address'];
+		$form.name = groupName;
+		$form.descripton = data.description ? data.description : undefined;
+		if (Array.isArray(data)) {
+			tags.set(
+				$config.data.firewall.group['mac-group'][`${groupName}`]['mac-address'].map(
+					(value: MacAddress) => ({ id: value, value: value })
+				)
+			);
+		} else {
+			console.log(data);
+			tags.set([{ id: data, value: data }]);
+			console.log($tags);
+		}
+	} else {
+		$form.name = ""
+		$form.description = ""
+		tags.set([]);
+	}
+	export let open: boolean = false;
 	const { form, errors, enhance, constraints, delayed, allErrors } = superForm(
 		superValidateSync(macGroup),
 		{
@@ -22,14 +49,24 @@
 			validators: macGroup,
 			taintedMessage: null,
 			async onUpdate({ form }) {
+				console.log($form.mac);
 				if (form.valid) {
 					// TODO: Change so it will add the list of mac-addresses filled in the input-tags
-					toast.promise(vyos.set.firewall.group.macGroup(form.data.name).address(['00:00:5e:00:53:a3', '00:00:5e:00:53:a4']), {
+					const result = async () => {
+						try {
+							await vyos.set.firewall.group.macGroup(form.data.name).address($form.mac);
+							await vyos.set.firewall.group.macGroup(form.data.name).description($form.description);
+						} catch (error) {
+							// TODO add better error based on the request that failed.
+							return 'Something went wrong';
+						}
+					};
+					toast.promise(result, {
 						loading: 'Creating group..',
 						success: () => {
 							open = false;
-							$form.mac = ""
-							$form.name = ""
+							$form.mac = [];
+							$form.name = '';
 							fetchConfig();
 							return 'Group created';
 						},
@@ -78,13 +115,14 @@
 	}
 
 	const vyos = new Vyos('https://172.16.20.104:8443', '31e38809-7f86-49df-8ed3-ec2278649312');
+	// $: $form.mac = $tags.map((obj) => obj.value);
 	// vyos.set.firewall.group.macGroup('test').address('hoi')
 </script>
 
 <Drawer.Root bind:open>
-	<Drawer.Trigger>
+	<!-- <Drawer.Trigger>
 		<Button variant="secondary" class="!ml-auto font-semibold">Create Group</Button>
-	</Drawer.Trigger>
+	</Drawer.Trigger> -->
 	<Drawer.Content class="mx-auto w-[64rem]">
 		<Drawer.Header>
 			<Drawer.Title>Create MAC Group</Drawer.Title>
@@ -92,16 +130,23 @@
 		<div class="p-4 pb-0">
 			<form id="add-mac-group-form" method="POST" use:enhance>
 				<Label for="group-name">Name</Label>
-				<Input id="group-name" bind:value={$form.name} placeholder="my-mac-group" />
+				<Input id="group-name" bind:value={$form.name} placeholder="my-mac-group" required />
+				<Label for="group-name">Description</Label>
+				<Input id="group-description" bind:value={$form.description} />
+				<input type="hidden" bind:value={$form.mac} />
 				<Label for="group-members">Addresses</Label>
-				<Input
+				<!-- TODO: add posibility to include other groups. -->
+				<!-- <Input
 					id="group-name"
 					bind:value={$form.mac}
 					placeholder="88:a4:c2:15:b6:4f, 4c:d5:77:c0:19:81"
-				/>
+				/> -->
 				<!-- TODO: Add a 'Recycle Bin' tags-input where deleted mac-addresses will go. This input will have a button to restore the mac-addresses -->
 				<!-- TODO: Make form work with the input of the mac-address tags -->
 				<TagsInput bind:tags />
+				{#if $errors.mac}
+					<div class="text-sm font-medium text-destructive">{$errors.mac._errors}</div>
+				{/if}
 			</form>
 			<SuperDebug data={$form} />
 		</div>

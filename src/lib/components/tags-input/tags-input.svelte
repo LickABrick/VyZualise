@@ -9,10 +9,14 @@
 	} = createTagsInput({
 		unique: true,
 		tags,
-		add(tag) {
+		add(tag: string) {
+			if(!(new RegExp('^[a-fA-F0-9]{2}(:[a-fA-F0-9]{2}){5}$')).test(tag)) {
+				console.log("not a mac")
+				throw new Error('value is not a mac-address')
+			}
 			return { id: tag, value: tag };
 		},
-		addOnPaste: true
+		addOnPaste: true,
 	});
 </script>
 
