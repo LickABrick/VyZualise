@@ -34,7 +34,6 @@
 			taintedMessage: null,
 			async onUpdate({ form }) {
 				if (form.valid) {
-					console.log(form.data);
 					await toast.promise(fetchConfig(form.data.apiKey, form.data.endpoint), {
 						loading: 'Retrieving config...',
 						success: (response: any) => {
@@ -64,7 +63,6 @@
 						body: form
 					})
 						.then((response) => {
-							console.log('🚀 ~ .then ~ response:', response);
 							// Check if the request was successful (status code 2xx)
 							if (!response.ok) {
 								throw new Error(`HTTP error! Status: ${response.status}`);

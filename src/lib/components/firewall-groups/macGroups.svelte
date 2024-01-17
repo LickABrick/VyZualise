@@ -17,7 +17,8 @@
 				MAC Groups
 			</div>
 			<div class="!ml-auto">
-				<AddMacGroupDrawer />
+				<!-- TODO: On open of drawer pass the groupName to the drawer so it will show the corresponding values in the drawer -->
+				<AddMacGroupDrawer groupName="TEST-GROUP" />
 			</div>
 		</Card.Title>
 		<Card.Description>A mac group represents a collection of mac addresses.</Card.Description>

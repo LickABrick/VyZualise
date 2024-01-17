@@ -7,9 +7,13 @@
 	import { config } from '$lib/stores';
 	import { Vyos } from '$lib/vyos';
 	import { superForm, superValidateSync } from 'sveltekit-superforms/client';
-	import { macGroup } from '$lib/schemas';
+	import { macAddress, macGroup, type MacAddress } from '$lib/schemas';
 	import SuperDebug from 'sveltekit-superforms/client/SuperDebug.svelte';
-
+	import TagsInput from '../tags-input/tags-input.svelte';
+	import { writable, type Writable } from 'svelte/store';
+	
+	export let groupName: any
+	let tags: Writable<string[]> = writable($config.data.firewall.group['mac-group'][`${groupName}`]['mac-address'].map((value: MacAddress) => ({ id: value, value: value})))
 	let open: boolean = false;
 	const { form, errors, enhance, constraints, delayed, allErrors } = superForm(
 		superValidateSync(macGroup),
@@ -19,7 +23,8 @@
 			taintedMessage: null,
 			async onUpdate({ form }) {
 				if (form.valid) {
-					toast.promise(vyos.firewall.group.macGroup(form.data.name).set(form.data.mac), {
+					// TODO: Change so it will add the list of mac-addresses filled in the input-tags
+					toast.promise(vyos.set.firewall.group.macGroup(form.data.name).address(['00:00:5e:00:53:a3', '00:00:5e:00:53:a4']), {
 						loading: 'Creating group..',
 						success: () => {
 							open = false;
@@ -31,8 +36,6 @@
 						error: 'Something went wrong!'
 					});
 				}
-
-				console.log(form.data);
 			}
 		}
 	);
@@ -59,7 +62,6 @@
 					})
 					.then((configData) => {
 						$config = configData;
-						console.log($config);
 						resolve(configData);
 					})
 					.catch((error) => {
@@ -76,7 +78,7 @@
 	}
 
 	const vyos = new Vyos('https://172.16.20.104:8443', '31e38809-7f86-49df-8ed3-ec2278649312');
-	vyos.firewall.group.macGroup('ddd').set()
+	// vyos.set.firewall.group.macGroup('test').address('hoi')
 </script>
 
 <Drawer.Root bind:open>
@@ -97,6 +99,9 @@
 					bind:value={$form.mac}
 					placeholder="88:a4:c2:15:b6:4f, 4c:d5:77:c0:19:81"
 				/>
+				<!-- TODO: Add a 'Recycle Bin' tags-input where deleted mac-addresses will go. This input will have a button to restore the mac-addresses -->
+				<!-- TODO: Make form work with the input of the mac-address tags -->
+				<TagsInput bind:tags />
 			</form>
 			<SuperDebug data={$form} />
 		</div>
