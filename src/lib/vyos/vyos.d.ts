@@ -14,6 +14,17 @@ declare class Client {
             };
         };
     };
+    delete: {
+        firewall: {
+            group: {
+                macGroup: (groupName: string) => {
+                    address: (values: string[]) => Promise<void>;
+                    description: (description: string) => Promise<void>;
+                    include: (values: string[]) => Promise<void>;
+                };
+            };
+        };
+    };
 
     request(method: string, url: string, data?: string): Promise<any>;
 }

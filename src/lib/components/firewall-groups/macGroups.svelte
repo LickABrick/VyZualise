@@ -1,15 +1,37 @@
 <script lang="ts">
 	import * as Card from '$lib/components/ui/card';
-	import { Component, SquareStack, Plus, Pen } from 'lucide-svelte';
+	import { Component, Pen, Trash2, Loader2 } from 'lucide-svelte';
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import * as Table from '$lib/components/ui/table';
 	import { Badge } from '$lib/components/ui/badge';
+	import * as AlertDialog from '$lib/components/ui/alert-dialog';
 	import { config } from '$lib/stores';
-	import { AddMacGroupDrawer } from '$lib/components/firewall-groups';
 	import { Button } from '../ui/button';
+	import AddMacGroupDialog from './AddMacGroupDialog.svelte';
+	import { vyos } from '$lib/client';
+	import { toast } from 'svelte-sonner';
+	import { fetchConfig } from '$lib/vyos/vyos';
 
 	let groupToEdit: string | undefined;
-	let addGroupDrawerOpen: boolean = false;
+	let addGroupDrawerOpen: boolean;
+	let deleteDialogOpen: boolean = false;
+	let delayed: boolean = false;
+
+	function deleteGroup() {
+		delayed = true;
+		
+		toast.promise($vyos.delete.firewall.group.macGroup(groupToEdit).any(), {
+			loading: 'Deleting group..',
+			success: () => {
+				fetchConfig();
+				delayed = false;
+				// Seems like we can only execute 1 API request at the same time so we have to disable the buttons and leave the dialog open until the action is completed.
+				deleteDialogOpen = false;
+				return 'Group deleted';
+			},
+			error: 'Something went wrong!'
+		});
+	}
 </script>
 
 <Card.Root>
@@ -20,11 +42,13 @@
 				MAC Groups
 			</div>
 			<div class="!ml-auto">
-				<!-- TODO: On open of drawer pass the groupName to the drawer so it will show the corresponding values in the drawer -->
 				<Button
 					variant="secondary"
 					class="!ml-auto font-semibold"
-					on:click={() => {addGroupDrawerOpen = true; groupToEdit = undefined}}>Create Group</Button
+					on:click={() => {
+						addGroupDrawerOpen = true;
+						groupToEdit = undefined;
+					}}>Create Group</Button
 				>
 			</div>
 		</Card.Title>
@@ -80,14 +104,26 @@
 							{/if}
 						</Table.Cell>
 						<Table.Cell class="w-[2rem]">
-							<Button
-								variant="outline"
-								size="icon"
-								on:click={() => {
-									groupToEdit = name;
-									addGroupDrawerOpen = true;
-								}}><Pen class="size-[1.2rem]" /></Button
-							>
+							<div class="flex gap-2">
+								<Button
+									variant="outline"
+									size="icon"
+									on:click={() => {
+										groupToEdit = name;
+										deleteDialogOpen = true;
+									}}><Trash2 class="size-[1.2rem]" /></Button
+								>
+								<Button
+									variant="outline"
+									size="icon"
+									on:click={() => {
+										groupToEdit = name;
+										addGroupDrawerOpen = true;
+									}}
+								>
+									<Pen class="size-[1.2rem]" />
+								</Button>
+							</div>
 						</Table.Cell>
 					</Table.Row>
 				{/each}
@@ -98,4 +134,31 @@
 		<p>Card Footer</p>
 	</Card.Footer>
 </Card.Root>
-<AddMacGroupDrawer bind:open={addGroupDrawerOpen} bind:groupName={groupToEdit} />
+
+<AddMacGroupDialog bind:open={addGroupDrawerOpen} bind:groupName={groupToEdit} />
+
+<AlertDialog.Root bind:open={deleteDialogOpen}>
+	<AlertDialog.Content>
+		<AlertDialog.Header>
+			<AlertDialog.Title
+				>Are you absolutely sure you want to delete <span class="text-destructive"
+					>{groupToEdit}</span
+				>?</AlertDialog.Title
+			>
+			<AlertDialog.Description>
+				This action cannot be undone. This will permanently delete the MAC group from your VyOS
+				server.
+			</AlertDialog.Description>
+		</AlertDialog.Header>
+		<AlertDialog.Footer>
+			<AlertDialog.Cancel bind:disabled={delayed}>Cancel</AlertDialog.Cancel>
+			<Button bind:disabled={delayed} variant="destructive" on:click={() => deleteGroup()}>
+				{#if !delayed}
+					I'm sure
+				{:else}
+					<Loader2 class="size-[1.2rem] animate-spin" />
+				{/if}
+			</Button>
+		</AlertDialog.Footer>
+	</AlertDialog.Content>
+</AlertDialog.Root>

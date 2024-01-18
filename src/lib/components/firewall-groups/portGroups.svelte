@@ -40,7 +40,7 @@
 							{:else}
 								<Badge class="ml-2">{addressItem}</Badge>
 							{/if}
-							<!-- TODO: fix include for network groups, probably doesn't work :) -->
+							<!-- TODO: fix include for port groups, probably doesn't work :) -->
 							{#if addressItem.include}
 								{#each addressItem.include as item}
 									<Tooltip.Root openDelay={100}>

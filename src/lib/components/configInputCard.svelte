@@ -15,6 +15,8 @@
 
 	import { toast } from 'svelte-sonner';
 	import { base } from '$app/paths';
+	import { vyos } from '$lib/client';
+	import { Vyos } from '$lib/vyos/index';
 
 	onMount(async () => {
 		$form.apiKey = window.sessionStorage.getItem('vyos-apikey') || '';
@@ -34,12 +36,13 @@
 			taintedMessage: null,
 			async onUpdate({ form }) {
 				if (form.valid) {
-					await toast.promise(fetchConfig(form.data.apiKey, form.data.endpoint), {
+					toast.promise(fetchConfig(form.data.apiKey, form.data.endpoint), {
 						loading: 'Retrieving config...',
 						success: (response: any) => {
 							window.sessionStorage.setItem('vyos-apikey', form.data.apiKey);
 							window.localStorage.setItem('vyos-endpoint-url', form.data.endpoint);
 							config.set(response);
+							vyos.set(new Vyos(form.data.endpoint, form.data.apiKey))
 							goto(`${base}/config`);
 							return 'Config loaded successfully';
 						},
